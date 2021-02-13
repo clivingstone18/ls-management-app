@@ -1,0 +1,60 @@
+{
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject"
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts/"
+    ]
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-regular-svg-icons": "^5.15.1",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/react-native-fontawesome": "^0.2.6",
+    "@react-native-async-storage/async-storage": "^1.13.2",
+    "@react-native-community/checkbox": "^0.5.6",
+    "@react-native-community/datetimepicker": "3.0.0",
+    "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-community/picker": "1.6.6",
+    "@react-native-picker/picker": "^1.9.4",
+    "@react-navigation/drawer": "^5.11.4",
+    "@react-navigation/native": "^5.8.10",
+    "@react-navigation/stack": "^5.12.8",
+    "expo": "^39.0.5",
+    "expo-font": "~8.3.0",
+    "expo-print": "~9.1.0",
+    "expo-status-bar": "~1.0.2",
+    "jspdf": "^2.1.1",
+    "jspdf-autotable": "^3.5.13",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.4.tar.gz",
+    "react-native-emoji": "^1.8.0",
+    "react-native-fontawesome": "^7.0.0",
+    "react-native-gesture-handler": "~1.7.0",
+    "react-native-number-selector": "^1.0.1",
+    "react-native-render-html": "^4.2.4",
+    "react-native-screens": "~2.10.1",
+    "react-native-svg": "^12.1.0",
+    "react-native-table-component": "^1.2.1",
+    "react-native-view-shot": "3.1.2",
+    "react-native-web": "~0.13.12",
+    "react-number-selector": "^1.0.6",
+    "react-to-pdf": "0.0.13",
+    "react-to-print": "^2.12.0"
+  },
+  "devDependencies": {
+    "@babel/core": "~7.9.0",
+    "@types/react": "~16.9.35",
+    "@types/react-dom": "~16.9.8",
+    "@types/react-native": "~0.63.2",
+    "typescript": "~3.9.5"
+  },
+  "private": true
+}
