@@ -25,6 +25,7 @@ const month = [
 ];
 
 function timeToStr(today) {
+
   let hour = today.getHours();
   let minute = today.getMinutes();
   let timeOfDay;

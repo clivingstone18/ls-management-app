@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import CheckBox from "@react-native-community/checkbox";
 import Emoji from "react-native-emoji";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";

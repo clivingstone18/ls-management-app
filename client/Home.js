@@ -1,19 +1,18 @@
-import React, { useState, Button, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Clock from "./Clock";
-import { View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 import { useFonts } from "expo-font";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faEdit,
-  faCopy,
-  faSignOutAlt,
-} from "@fortawesome/free-solid-svg-icons";
 import { calcRatio } from "./calcRatio";
 import { Stats } from "./Stats";
 import { Widgets } from "./Widgets";
 import { StaffPanel } from "./StaffPanel";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
+
 
 export const Home = (props) => {
+  const isFocused = useIsFocused();
+  const [loading, setLoading] = useState(false)
   const [info, setInfo] = useState([
     {
       date: "none",
@@ -25,11 +24,45 @@ export const Home = (props) => {
     },
   ]);
   const [staffOnDuty, setStaffOnDuty] = useState([]);
-  const [loaded] = useFonts({
+  const [fontLoaded] = useFonts({
     mainFont: require("./assets/fonts/Roboto-Thin.ttf"),
   });
 
-  const reset = () => {
+  useEffect(() => {
+    setLoading(true);
+    const getData = async () => {
+      try {
+        let jsonValue = await AsyncStorage.getItem("childrenCount");
+        if (jsonValue !== null) {
+          return JSON.parse(jsonValue);
+        } else {
+          return ([
+            {
+              date: "none",
+              numKook: 0,
+              numKangaroos: 0,
+              numEmus: 0,
+              numNursery: 0,
+              staffOnDuty: [],
+            },
+          ]);
+        }
+      } catch (e) {
+        console.log(e);
+        return e;
+      }
+    };
+    getData()
+      .then((val) => {
+        setLoading(false);
+        setInfo(val)
+      })
+      .catch((e) => console.log("failed"));
+  }, [props, isFocused]);
+
+
+
+  const reset = async () => {
     setInfo([
       {
         date: "none",
@@ -41,6 +74,14 @@ export const Home = (props) => {
       },
     ]);
     setStaffOnDuty([]);
+    try {
+      let item = await AsyncStorage.setItem("childrenCount", "");
+      return item;
+    }
+    catch (err) {
+      return err
+    }
+
   };
 
   const staffNeeded = calcRatio(
@@ -49,7 +90,7 @@ export const Home = (props) => {
     info[info.length - 1].numEmus + info[info.length - 1].numKangaroos
   );
 
-  if (loaded) {
+  if (fontLoaded && !loading) {
     return (
       <View style={styles.container}>
         <View style={styles.topPanel}>

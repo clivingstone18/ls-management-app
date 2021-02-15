@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, Dimensions, ScrollView } from "react-native";
-import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
-import { timeToStr, minsToNextUpdate } from "./TimeKeeper.js";
+import { StyleSheet, View, Dimensions, ScrollView } from "react-native";
+import { Table, Row, Rows } from "react-native-table-component";
+import { timeToStr } from "./TimeKeeper.js";
 import { calcRatio } from "./calcRatio";
 
 const { height } = Dimensions.get("window");
@@ -44,7 +44,7 @@ export const PrintSheet = (props) => {
     }
     info = info.slice(1, info.length);
     const res = info.map((elem) => [
-      timeToStr(elem.date),
+      elem.date,
       elem.numNursery,
       elem.numKook,
       elem.numEmus,

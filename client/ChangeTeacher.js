@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  View,
   StyleSheet,
   Button,
-  Text,
-  TouchableOpacity,
-  Switch,
 } from "react-native";
-import { ActivatedForm } from "./ActivatedForm";
-import { ButtonAll } from "./ButtonAll.js";
 import { TeacherToggle } from "./TeacherToggle.js";
 
 export const ChangeTeacher = (props) => {

@@ -10,16 +10,18 @@ import {
   faHome,
 } from "@fortawesome/free-solid-svg-icons";
 import { print } from "./print";
-import RNViewShot from "react-native-view-shot";
 
 export const Widgets = (props) => {
+
   const handlePrint = () => {
     if (props.info[props.info.length - 1].date !== "none") {
-      print(props.info);
+      print(props.info).then(res=>console.log(res)).catch(err=>console.log(err))
     } else {
       alert("Nothing to print yet");
     }
   };
+
+
 
   return (
     <View style={styles.widgetContainer}>

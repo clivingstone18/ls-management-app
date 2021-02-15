@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import moment from 'moment'; 
+
 import {
   View,
-  Button,
   Platform,
-  TextInput,
   Text,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useFonts } from "expo-font";
-import { timeToStr, minsToNextUpdate, dateToStr } from "./TimeKeeper.js";
-import { Picker } from "@react-native-picker/picker";
+import { timeToStr } from "./TimeKeeper.js";
 import { ButtonAll } from "./ButtonAll";
 import Emoji from "react-native-emoji";
+import {GroupCounter} from "./GroupCounter"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const UpdateInfo = (props) => {
   const [mode, setMode] = useState("time");
   const [show, setShow] = useState(false);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(moment().format("hh:mm A"));
   const [numActive, setNumActive] = useState(0);
 
   let info = props.route.params.prevInfo;
@@ -33,20 +33,45 @@ export const UpdateInfo = (props) => {
   const [showPicker4, setShowPicker4] = useState(false);
   const [showTime, setShowTime] = useState(false);
 
-  const onSubmit = () => {
+  // add to local storage 
+
+  async function storeData(newInfo) {
+    try {
+      const jsonValue = JSON.stringify(newInfo);
+      let item = await AsyncStorage.setItem("childrenCount", jsonValue);
+      return item;
+    } catch (e) {
+      alert("Error saving, try again");
+      return e;
+    }
+  }
+
+  useEffect(() => {
+    var now = moment().format("hh:mm A");
+    setDate(now)
+  }, [])
+
+  const onSubmit = async () => {
+    var now = moment().format("hh:mm A");
     let newInfo = {
-      date: date,
+      date: now,
       numNursery: numNursery,
       numKangaroos: numKangaroos,
       numEmus: numEmus,
       numKook: numKook,
       staffOnDuty: props.route.params.staffOnDuty,
     };
-    props.route.params.updateInfo([...props.route.params.prevInfo, newInfo]);
+    let allInfo = [...props.route.params.prevInfo, newInfo]
+   // props.route.params.updateInfo(allInfo);
+
+    let result = storeData(allInfo)
     props.navigation.goBack();
+
+
+    // time to save to local storage 
   };
 
-  const handleShow = (currPicker, currPickerMethod) => {
+  const handleShow = (currPicker) => {
     let vars = [showPicker1, showPicker2, showPicker3, showPicker4, showTime];
     let methods = [
       setShowPicker1,
@@ -67,46 +92,12 @@ export const UpdateInfo = (props) => {
     }
   };
 
-  const onChange = (event, selectedDate) => {
+  const onChange = (selectedDate) => {
     const currentDate = selectedDate || date;
+    console.log(currentDate);
     setShow(Platform.OS === "ios");
     setDate(currentDate);
   };
-
-  const showMode = (currentMode) => {
-    setShow(!show);
-    setMode(currentMode);
-  };
-
-  const showTimepicker = () => {
-    showMode("time");
-  };
-
-  let pickers = [];
-  let pickeritems = [];
-  let groups = [
-    { val: numNursery, setter: setNumNursery, key: 0 },
-    { val: numKook, setter: setNumKook, key: 1 },
-    { val: numEmus, setter: setNumEmus, key: 2 },
-    { val: numKangaroos, setter: setNumKangaroos, key: 3 },
-  ];
-
-  for (let j = 0; j < 21; j++) {
-    pickeritems[j] = <Picker.Item label={j.toString()} value={j} key={j} />;
-  }
-
-  for (let i = 0; i < groups.length; i++) {
-    pickers[i] = (
-      <Picker
-        style={{ height: 200, width: 100, alignSelf: "center" }}
-        key={i}
-        onValueChange={(value) => groups[i].setter(value)}
-        selectedValue={groups[i].val}
-      >
-        {pickeritems}
-      </Picker>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -120,7 +111,7 @@ export const UpdateInfo = (props) => {
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.text}>{timeToStr(date)}</Text>
+            <Text style={styles.text}>{date}</Text>
             <TouchableOpacity onPress={() => handleShow(4, !showTime)}>
               {!showTime ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
@@ -160,7 +151,8 @@ export const UpdateInfo = (props) => {
             </TouchableOpacity>
           </View>
         </View>
-        {showPicker1 ? pickers[0] : null}
+        {showPicker1 ? <GroupCounter count={numNursery} setCount={setNumNursery} /> : null}
+
 
         <Text style={styles.text}>Number in kookaburra</Text>
         <View style={styles.form}>
@@ -181,7 +173,7 @@ export const UpdateInfo = (props) => {
             </TouchableOpacity>
           </View>
         </View>
-        {showPicker2 ? pickers[1] : null}
+        {showPicker2 ? <GroupCounter count={numKook} setCount={setNumKook} /> : null}
 
         <Text style={styles.text}>Number in emus</Text>
         <View style={styles.form}>
@@ -202,7 +194,7 @@ export const UpdateInfo = (props) => {
             </TouchableOpacity>
           </View>
         </View>
-        {showPicker3 ? pickers[2] : null}
+        {showPicker3 ? <GroupCounter count={numEmus} setCount={setNumEmus} /> : null}
 
         <Text style={styles.text}>Number in kangaroos</Text>
         <View style={styles.form}>
@@ -223,7 +215,7 @@ export const UpdateInfo = (props) => {
             </TouchableOpacity>
           </View>
         </View>
-        {showPicker4 ? pickers[3] : null}
+        {showPicker4 ? <GroupCounter count={numKangaroos} setCount={setNumKangaroos} /> : null}
       </View>
       <View>
         <ButtonAll handlePress={onSubmit} title={"Save changes"} />
@@ -239,6 +231,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FAFAFA",
     flexDirection: "column",
     justifyContent: "space-between",
+    
   },
   form: {
     backgroundColor: "white",

@@ -1,11 +1,9 @@
 import * as Print from "expo-print";
-import { PrintSheet } from "./PrintSheet";
-import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { timeToStr, minsToNextUpdate, dateToStr } from "./TimeKeeper";
+import { timeToStr, dateToStr } from "./TimeKeeper";
 import { calcRatio } from "./calcRatio";
 
-export const print = (info) => {
+export const print = async (info) => {
+  return new Promise((resolve, reject) =>  {
   info = info.slice(1);
 
   const headers = [
@@ -63,22 +61,31 @@ export const print = (info) => {
     "<h2>Ratio Check for " +
     dateToStr(info[0].date) +
     "</h2><table><thead><tr>" +
-    headers.map((header) => "<th>" + header + "</th>") +
+    headers.map((header) => "<th>" + header + "</th>").join("") +
     "</tr></thead><tbody>" +
-    info.map((element) => "<tr>" + getInfoAsStr(element) + "</tr>") +
+    info.map((element) => "<tr>" + getInfoAsStr(element) + "</tr>").join("") +
     "</tbody></table></body>";
+
   let { pdfURI, numPages, base64 } = Print.printToFileAsync({
     html: html,
     width: 612,
     height: 792,
     base64: true,
   });
-  Print.printAsync({
-    uri: pdfURI,
-    html: html,
-    width: 612,
-    height: 792,
-    printerUrl: printerUrl,
-    orientation: Print.Orientation.portrait,
-  });
-};
+
+  try {
+    let printedFile = Print.printAsync({
+      uri: pdfURI,
+      html: html,
+      width: 612,
+      height: 792,
+      printerUrl: printerUrl,
+      orientation: Print.Orientation.portrait,
+    });
+    resolve(printedFile)
+  }
+  catch (err) {
+    reject(err)
+  }
+})
+}
