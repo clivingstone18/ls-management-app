@@ -8,7 +8,7 @@ import {
   faCopy,
   faUserAlt,
   faInfo,
-  faHome,
+  faUserAltSlash,
   faCaretRight,
   faCaretLeft,
   faBookOpen,
@@ -112,7 +112,25 @@ export const Widgets = (props) => {
           />
         </TouchableOpacity>
       </View>
+
       <View style={styles.widget}>
+        <TouchableOpacity
+          disabled={props.info.length === 1}
+          onPress={() => resetData(props)}
+        >
+          <Text style={styles.text}>Reset staff on duty</Text>
+          <FontAwesomeIcon
+            style={{ alignSelf: "center" }}
+            icon={faUserAltSlash}
+            size={32}
+          />
+        </TouchableOpacity>
+      </View>
+
+     </> : 
+      <>
+
+<View style={styles.widget}>
         <TouchableOpacity
           onPress={() =>
  props.navigate("StaffDirectory", {
@@ -128,8 +146,6 @@ export const Widgets = (props) => {
           />
         </TouchableOpacity>
       </View>
-     </> : 
-      <>
      
       <View style={styles.widget}>
         <TouchableOpacity
@@ -150,19 +166,7 @@ export const Widgets = (props) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.widget}>
-        <TouchableOpacity
-          disabled={props.info.length === 1}
-          onPress={() => resetData(props)}
-        >
-          <Text style={styles.text}>Reset staff on duty</Text>
-          <FontAwesomeIcon
-            style={{ alignSelf: "center" }}
-            icon={faHome}
-            size={32}
-          />
-        </TouchableOpacity>
-      </View>
+
       </>
 }
 

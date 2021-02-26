@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "moment": "^2.29.1",
+    "react-native-html-to-pdf": "^0.9.1"
+  }
+}
