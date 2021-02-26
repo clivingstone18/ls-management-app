@@ -11,13 +11,28 @@ import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { ButtonAll } from "../ButtonAll";
 import AnimatedLoader from "react-native-animated-loader";
 import { useIsFocused } from "@react-navigation/native";
-import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const DiplomaInfo = (props) => {
+  const staffOnDuty = props.staffOnDuty;
+  const setStaffOnDuty = props.setStaffOnDuty;
+  const setResetting = props.setResetting;
+
   const [removing, setRemoving] = useState(false);
-  const [staffList, setStaffList] = useState([]);
+  const [staffList, setStaffList] = useState();
   const [loading, setLoading] = useState(false)
   const isFocused = useIsFocused();
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("staffPicked", jsonValue)
+      return value;
+    } catch (e) {
+      alert("Error saving, try again");
+    }
+  };
+
 
   const sorted = (staffObjectList) => {
     staffObjectList.sort((a, b) => {
@@ -38,7 +53,6 @@ export const DiplomaInfo = (props) => {
     if (props.route && props.route.params && props.route.params.cancelled) {
       return;
     }
-
     if (isFocused) { 
       setLoading(true);
       UserService.getAllStaff().then(res=>{
@@ -51,12 +65,24 @@ export const DiplomaInfo = (props) => {
 
   const handleRemove = async (staffId) => {
     setLoading(true);
+    let newStaffOnDuty = staffOnDuty.filter(staff => staff.staffid !== staffId)
+    setStaffOnDuty(newStaffOnDuty)
+    // do the async storage 
+    storeData(newStaffOnDuty).then(res=>{
     UserService.deleteStaff(staffId).then(res => {
       UserService.getAllStaff().then(res=>{
         setStaffList(res.data)
         setLoading(false)
       }).catch(err=>{setLoading(false); console.log(err)})
     }).catch(err=>{setLoading(false); console.log(err)})
+
+
+  }).catch(err=>{setLoading(false); console.log(err)})
+
+
+
+
+
   }
 
   useEffect(() => {
@@ -105,14 +131,16 @@ export const DiplomaInfo = (props) => {
 
   return (
     <View style={styles.container}>
-
-      {loading && <AnimatedLoader
+      {loading ? <AnimatedLoader
         visible={true}
         overlayColor="rgba(255,255,255,0.75)"
         source={require("./loader.json")}
         animationStyle={styles.lottie}
-        speed={1} /> }
-        
+        speed={1} /> 
+
+        :
+       <>
+      
 
 {Array.isArray(staffList) &&
   staffList.length !== 0 && <Text style={styles.header}>Little Scribblers Staff Directory</Text> }
@@ -157,10 +185,15 @@ export const DiplomaInfo = (props) => {
         ? 
         <View style={styles.infoContainer}>{staffToText()}</View>
       : null}
+           </>
+      }
     
       
      </View>
+     
+
   )
+  
     };
 
 const styles = StyleSheet.create({

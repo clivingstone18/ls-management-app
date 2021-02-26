@@ -3,7 +3,6 @@ import { View, StyleSheet, Text } from "react-native";
 import { calcRatio } from "./calcRatio";
 
 export const Stats = ({ info, insufficientStaff }) => {
-  console.log(info)
   return (
     <View style={styles.statsContainer}>
       <View style={styles.stat}>

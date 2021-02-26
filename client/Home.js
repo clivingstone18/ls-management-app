@@ -15,6 +15,7 @@ export const Home = (props) => {
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(false)
   const [resetting, setResetting] = useState(false)
+  const [refresh, setRefresh] = useState(true)
   const [info, setInfo] = useState(
     {
       dateof: "none",
@@ -46,10 +47,12 @@ export const Home = (props) => {
 
   useEffect(() => {
     if (resetting) {
-      getData().then(res=>{console.log(res); return}).catch(err=>{console.log(err); return})
+      setResetting(false)
+      getData().then(res=>{return}).catch(err=>{console.log(err); return})
     }
-    if (isFocused) {
+    if (isFocused && refresh) {
       setLoading(true)
+      setRefresh(false)
     getData()
       .then((val) => {
         setStaffOnDuty(val)
@@ -64,7 +67,7 @@ export const Home = (props) => {
       })
       .catch((e) => setLoading(false) );
     }
-  }, [props, isFocused, resetting]);
+  }, [props, isFocused]);
 
 
 
@@ -124,6 +127,7 @@ return (
         <Widgets
           navigate={props.navigation.navigate}
           setInfo={setInfo}
+          setRefresh={setRefresh}
           info={info}
           setResetting={setResetting}
           staffOnDuty={staffOnDuty}

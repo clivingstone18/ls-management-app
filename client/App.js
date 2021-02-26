@@ -6,7 +6,7 @@ import { Home } from "./Home";
 import { DateSheetTimeChanger } from "./DateSheetTimeChanger";
 import { ChangeTeacher } from "./ChangeTeacher";
 import { StaffDirectory } from "./StaffDirectory/StaffDirectory";
-
+import {DataView} from "./DataView"
 import { NavigationContainer } from "@react-navigation/native";
 import {
   createStackNavigator,
@@ -23,6 +23,8 @@ function App() {
         <Stack.Screen name="PrintSheet" component={DateSheetTimeChanger} />
         <Stack.Screen name="ChangeTeacher" component={ChangeTeacher} />
         <Stack.Screen name="StaffDirectory" component={StaffDirectory} />
+        <Stack.Screen name="DataView" component={DataView} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

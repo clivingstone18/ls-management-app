@@ -36,6 +36,7 @@ export const UpdateInfo = (props) => {
 
   const onSubmit = async () => {
     setLoading(true);
+    props.route.params.setRefresh(true);
     var now = moment(date).format("HH:mm");
     let newInfo = {
       date: moment(date).format("YYYY-MM-D"),
@@ -48,7 +49,7 @@ export const UpdateInfo = (props) => {
     };
     UserService.addNewClassData(newInfo).then(res=>{
       setLoading(false)
-      props.navigation.navigate("Home", {cancelled:false});
+      props.navigation.navigate("Home");
     }).then(err=>setLoading(false))
   };
 

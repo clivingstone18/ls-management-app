@@ -15,8 +15,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { print } from "./print";
 
-
 const resetData = async (props) => {
+  props.setRefresh(true)
   props.setResetting(true)
   try {
     await AsyncStorage.setItem("staffPicked", "")
@@ -34,7 +34,7 @@ export const Widgets = (props) => {
 
   const handlePrint = () => {
     if (props.info.dateof !== "none") {
-      print(props.info).then(res=>console.log(res)).catch(err=>console.log(err))
+      print(props.info).then(res=>{return}).catch(err=>console.log(err))
     } else {
       alert("Nothing to print yet");
     }
@@ -65,6 +65,7 @@ export const Widgets = (props) => {
           onPress={() =>
             props.staffOnDuty.length
               ? props.navigate("UpdateInfo", {
+                  setRefresh: props.setRefresh,
                   updateInfo: props.setInfo,
                   prevInfo: props.info,
                   staffOnDuty: props.staffOnDuty,
@@ -83,6 +84,7 @@ export const Widgets = (props) => {
       <View style={styles.widget}>
         <TouchableOpacity
           onPress={() => props.navigate("ChangeTeacher", {
+            setRefresh: props.setRefresh,
                   staffOnDuty: props.staffOnDuty,
                   setStaffOnDuty: props.setStaffOnDuty,
                 })
@@ -135,6 +137,8 @@ export const Widgets = (props) => {
           onPress={() =>
  props.navigate("StaffDirectory", {
                   staffOnDuty: props.staffOnDuty,
+                  setStaffOnDuty: props.setStaffOnDuty,
+                  setResetting: props.setResetting,
                 })
           }
         >
@@ -149,15 +153,11 @@ export const Widgets = (props) => {
      
       <View style={styles.widget}>
         <TouchableOpacity
-          onPress={() =>
-            props.info.dateof !== "none"
-              ? props.navigate("DiplomaInfo", {
-                  staffOnDuty: props.staffOnDuty,
+          onPress={() => props.navigate("DataView", {
                 })
-              : alert(props.info.date)
           }
         >
-          <Text style={styles.text}>View weekly data</Text>
+          <Text style={styles.text}>View daily data</Text>
           <FontAwesomeIcon
             style={{ alignSelf: "center" }}
             icon={faBookOpen}

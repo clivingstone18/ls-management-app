@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Button,
   View,
+  Text,
 } from "react-native";
 import { TeacherToggle } from "./TeacherToggle.js";
 import UserService from "./services/UserService"
@@ -21,6 +22,7 @@ export const ChangeTeacher = (props) => {
 
   const handleSubmit = () => {
     setSubmit(true);
+    props.route.params.setRefresh(true)
   };
 
   const storeData = async (value) => {
@@ -126,7 +128,7 @@ export const ChangeTeacher = (props) => {
 
   return (
     <View style={styles.container}>
-                {loading ? <AnimatedLoader
+    {loading ? <AnimatedLoader
     visible={true}
     overlayColor="rgba(255,255,255,0.75)"
     source={require("./StaffDirectory/loader.json")}
@@ -151,8 +153,12 @@ export const ChangeTeacher = (props) => {
           />
         );
       })}
+      {staffList.length ? <Button title="Save changes" onPress={handleSubmit} /> : <Text style={styles.text}>
+        
+        No staff have been added to the staff directory.
+        
+        </Text>}
       </>}
-      <Button title="Save changes" onPress={handleSubmit}></Button>
     </View>
   );
 };

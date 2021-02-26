@@ -26,8 +26,15 @@ router.post('/api/staff/post', (req, res, next) => {
 
 router.post('/api/staff/delete', (req, res, next) => {
   let staffID = req.body.staffID;
-  let queryString = `DELETE from staff WHERE staffID = ${staffID};`;
-  connectToDB(queryString).then(response=>res.send(response)).catch(err=>res.send(err))
+  let queryString = `DELETE from staff WHERE staffid = '${staffID}';`;
+  console.log(queryString)
+  connectToDB(queryString).then(response=>{
+    console.log(response)
+    res.send(response)
+  }).catch(err=>{
+    console.log(err)
+    res.send(err)
+  })
 
 })
 
@@ -39,12 +46,9 @@ router.post('/api/classData/mostrecent/get', (req, res, next) => {
   ORDER  BY entryid DESC
   LIMIT  1;
   `
-  console.log(queryString)
   connectToDB(queryString).then(response=>{
-    console.log(response)
     res.send(response.rows)
   }).catch(err=>{
-    console.log(err)
     res.send(err)
   })
 
@@ -61,8 +65,7 @@ router.get('/api/classData/:date/get', (req, res, next) => {
   ; 
   `
 
-  connectToDB(queryString).then(response=>{console.log(response); res.send(response)}).catch(err=>{
-    console.log(err);
+  connectToDB(queryString).then(response=>{res.send(response)}).catch(err=>{
     res.send(err)
   })
 });
@@ -74,7 +77,6 @@ router.get('/api/classData/:date/get', (req, res, next) => {
 
 router.post('/api/classData/post', (req, res, next) => {
   let data = req.body.data;
-  console.log(data)
 
   let queryString = `INSERT INTO classData(numkook, numkoala, numemu, numkang, dateof, timeof) 
   VALUES ('${data.numKook}', '${data.numNursery}', '${data.numEmus}', '${data.numKangaroos}',

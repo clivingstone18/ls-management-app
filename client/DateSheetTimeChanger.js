@@ -12,7 +12,6 @@ export const DateSheetTimeChanger = () => {
   const [screenHeight, setScreenHeight] = useState(0);
   const scrollEnabled = screenHeight > height;
 
-
 const onContentSizeChange = (contentWidth, contentHeight) => {
     setScreenHeight(contentHeight);
   };
