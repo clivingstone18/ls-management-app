@@ -1,8 +1,5 @@
 import React, { useState, Button, useEffect } from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Switch } from "react-native";
-import { ActivatedForm } from "./ActivatedForm";
-import { ButtonAll } from "./ButtonAll.js";
-import { Row } from "react-native-table-component";
 
 export const TeacherToggle = ({
   onDuty,
@@ -28,10 +25,9 @@ export const TeacherToggle = ({
   };
 
   return (
-    <>
       <View style={styles.container}>
         <Text style={styles.text}>
-          {`${staff.firstName} ${staff.lastName[0]}`}{" "}
+          {`${staff.firstname} ${staff.lastname[0]}`}{" "}
         </Text>
         <Switch
           trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -41,7 +37,6 @@ export const TeacherToggle = ({
           value={isEnabled}
         />
       </View>
-    </>
   );
 };
 

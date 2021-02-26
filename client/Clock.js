@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { timeToStr, minsToNextUpdate, dateToStr } from "./TimeKeeper.js";
+import { timeToStr, dateToStr } from "./TimeKeeper.js";
 import { useFonts } from "expo-font";
 
 function Clock() {
-  const [time, setTime] = useState("");
-  const [day, setDay] = useState("");
-  const [timeToNextUpdate, setTimeToNextUpdate] = useState(0);
-
+  const [time, setTime] = useState(timeToStr(new Date()));
+  const [day, setDay] = useState(dateToStr(new Date()));
   const [loaded] = useFonts({
     mainFont: require("./assets/fonts/Roboto-Thin.ttf"),
   });
@@ -15,7 +13,6 @@ function Clock() {
   const tick = () => {
     let currDate = new Date();
     setTime(timeToStr(currDate));
-    setTimeToNextUpdate(minsToNextUpdate(currDate.getMinutes()));
     setDay(dateToStr(currDate));
   };
 
@@ -30,7 +27,6 @@ function Clock() {
     return (
       <View style={clockStyles.container}>
         <Text style={clockStyles.text}>{day}</Text>
-
         <Text style={clockStyles.text}>{time}</Text>
       </View>
     );
@@ -46,17 +42,17 @@ const clockStyles = StyleSheet.create({
     alignItems: "flex-start",
     justifyContent: "center",
     shadowColor: "#000",
-    borderRadius: 5,
+    borderRadius: 15,
     width: "94%",
-    paddingLeft: "2%",
+    paddingLeft: "4%",
     marginLeft: "3.2%",
     shadowOffset: {
       width: 0,
-      height: 12,
+      height: 5,
     },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.0,
-    elevation: 24,
+    shadowOpacity: 0.5,
+    shadowRadius: 5.0,
+    elevation: 10,
   },
   text: {
     fontSize: 40,

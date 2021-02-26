@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import moment from 'moment'; 
-
+import UserService from "./services/UserService"
 import {
   View,
   Platform,
@@ -9,24 +9,23 @@ import {
   TouchableOpacity,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { timeToStr } from "./TimeKeeper.js";
 import { ButtonAll } from "./ButtonAll";
 import Emoji from "react-native-emoji";
 import {GroupCounter} from "./GroupCounter"
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AnimatedLoader from "react-native-animated-loader";
 
 export const UpdateInfo = (props) => {
-  const [mode, setMode] = useState("time");
-  const [show, setShow] = useState(false);
-  const [date, setDate] = useState(moment().format("hh:mm A"));
+  const [date, setDate] = useState(new Date());
   const [numActive, setNumActive] = useState(0);
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const staffOnDuty = props.route.params.staffOnDuty;
 
   let info = props.route.params.prevInfo;
-  info = info[info.length - 1];
-  const [numNursery, setNumNursery] = useState(info.numNursery);
-  const [numKangaroos, setNumKangaroos] = useState(info.numKangaroos);
-  const [numEmus, setNumEmus] = useState(info.numEmus);
-  const [numKook, setNumKook] = useState(info.numKook);
+  const [numNursery, setNumNursery] = useState(info.numkoala);
+  const [numKangaroos, setNumKangaroos] = useState(info.numkang);
+  const [numEmus, setNumEmus] = useState(info.numemu);
+  const [numKook, setNumKook] = useState(info.numkook);
   const [showPicker1, setShowPicker1] = useState(false);
   const [showPicker2, setShowPicker2] = useState(false);
   const [showPicker3, setShowPicker3] = useState(false);
@@ -35,40 +34,22 @@ export const UpdateInfo = (props) => {
 
   // add to local storage 
 
-  async function storeData(newInfo) {
-    try {
-      const jsonValue = JSON.stringify(newInfo);
-      let item = await AsyncStorage.setItem("childrenCount", jsonValue);
-      return item;
-    } catch (e) {
-      alert("Error saving, try again");
-      return e;
-    }
-  }
-
-  useEffect(() => {
-    var now = moment().format("hh:mm A");
-    setDate(now)
-  }, [])
-
   const onSubmit = async () => {
-    var now = moment().format("hh:mm A");
+    setLoading(true);
+    var now = moment(date).format("HH:mm");
     let newInfo = {
-      date: now,
+      date: moment(date).format("YYYY-MM-D"),
+      time: now,
       numNursery: numNursery,
       numKangaroos: numKangaroos,
       numEmus: numEmus,
       numKook: numKook,
-      staffOnDuty: props.route.params.staffOnDuty,
+      staffOnDuty: staffOnDuty,
     };
-    let allInfo = [...props.route.params.prevInfo, newInfo]
-   // props.route.params.updateInfo(allInfo);
-
-    let result = storeData(allInfo)
-    props.navigation.goBack();
-
-
-    // time to save to local storage 
+    UserService.addNewClassData(newInfo).then(res=>{
+      setLoading(false)
+      props.navigation.navigate("Home", {cancelled:false});
+    }).then(err=>setLoading(false))
   };
 
   const handleShow = (currPicker) => {
@@ -92,26 +73,32 @@ export const UpdateInfo = (props) => {
     }
   };
 
-  const onChange = (selectedDate) => {
+  const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    console.log(currentDate);
-    setShow(Platform.OS === "ios");
+    setShow(Platform.OS === 'ios');
     setDate(currentDate);
   };
 
   return (
     <View style={styles.container}>
+      {loading && <AnimatedLoader
+        visible={true}
+        overlayColor="rgba(255,255,255,0.75)"
+        source={require("./StaffDirectory/loader.json")}
+        animationStyle={styles.lottie}
+        speed={0.1} />}
       <View>
         <Text style={styles.text}>Time</Text>
         <View style={styles.form}>
           <View
             style={{
               flex: 1,
+              backgroundColor: showTime ? "#f3f3f3" : "white",
               flexDirection: "row",
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.text}>{date}</Text>
+            <Text style={styles.text}>{moment(date).format("hh:mm A")}</Text>
             <TouchableOpacity onPress={() => handleShow(4, !showTime)}>
               {!showTime ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
@@ -125,7 +112,7 @@ export const UpdateInfo = (props) => {
           <DateTimePicker
             testID="dateTimePicker"
             value={date}
-            mode={mode}
+            mode="time"
             iRNNumberPickers24Hour={false}
             display="default"
             onChange={onChange}
@@ -137,6 +124,7 @@ export const UpdateInfo = (props) => {
           <View
             style={{
               flex: 1,
+              backgroundColor: showPicker1 ? "#f3f3f3" : "white",
               flexDirection: "row",
               justifyContent: "space-between",
             }}
@@ -159,6 +147,7 @@ export const UpdateInfo = (props) => {
           <View
             style={{
               flex: 1,
+              backgroundColor: showPicker2 ? "#f3f3f3" : "white",
               flexDirection: "row",
               justifyContent: "space-between",
             }}
@@ -181,6 +170,7 @@ export const UpdateInfo = (props) => {
             style={{
               flex: 1,
               flexDirection: "row",
+              backgroundColor: showPicker3 ? "#f3f3f3" : "white",
               justifyContent: "space-between",
             }}
           >
@@ -194,6 +184,7 @@ export const UpdateInfo = (props) => {
             </TouchableOpacity>
           </View>
         </View>
+
         {showPicker3 ? <GroupCounter count={numEmus} setCount={setNumEmus} /> : null}
 
         <Text style={styles.text}>Number in kangaroos</Text>
@@ -203,11 +194,12 @@ export const UpdateInfo = (props) => {
               flex: 1,
               flexDirection: "row",
               justifyContent: "space-between",
+              backgroundColor: showPicker4 ? "#f3f3f3" : "white",
             }}
           >
             <Text style={styles.text}>{numKangaroos}</Text>
             <TouchableOpacity onPress={() => handleShow(3, setShowPicker4)}>
-              {!showPicker3 ? (
+              {!showPicker4 ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
               ) : (
                 <Emoji name="arrow_up_small" style={{ fontSize: 30 }} />
@@ -226,9 +218,9 @@ export const UpdateInfo = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: "3.5%",
+    padding: "7%",
     flex: 1,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: "#f3f3f3",
     flexDirection: "column",
     justifyContent: "space-between",
     
@@ -236,13 +228,21 @@ const styles = StyleSheet.create({
   form: {
     backgroundColor: "white",
     borderRadius: 5,
+    paddingLeft: "0.5%",
+    marginBottom: "3%",
     flexDirection: "row",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5.0,
   },
-
   text: {
     fontFamily: "mainFont",
     fontSize: 20,
-    marginBottom: "1%",
+    marginBottom: "2%",
+    fontWeight: "bold",
+  },  lottie: {
+    width: 100,
+    height: 100
   },
 
   button: {

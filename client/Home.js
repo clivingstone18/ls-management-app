@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Clock from "./Clock";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, Text, Image, ScrollView} from "react-native";
 import { useFonts } from "expo-font";
 import { calcRatio } from "./calcRatio";
 import { Stats } from "./Stats";
@@ -8,74 +8,83 @@ import { Widgets } from "./Widgets";
 import { StaffPanel } from "./StaffPanel";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
-
+import UserService from "./services/UserService"
+import AnimatedLoader from "react-native-animated-loader";
 
 export const Home = (props) => {
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(false)
-  const [info, setInfo] = useState([
+  const [resetting, setResetting] = useState(false)
+  const [info, setInfo] = useState(
     {
-      date: "none",
-      numKook: 0,
-      numKangaroos: 0,
-      numEmus: 0,
-      numNursery: 0,
-      staffOnDuty: [],
+      dateof: "none",
+      timeof: "",
+      numkook: 0,
+      numkang: 0,
+      numemu: 0,
+      numkoala: 0,
     },
-  ]);
+  );
   const [staffOnDuty, setStaffOnDuty] = useState([]);
   const [fontLoaded] = useFonts({
     mainFont: require("./assets/fonts/Roboto-Thin.ttf"),
   });
 
-  useEffect(() => {
-    setLoading(true);
-    const getData = async () => {
-      try {
-        let jsonValue = await AsyncStorage.getItem("childrenCount");
-        if (jsonValue !== null) {
-          return JSON.parse(jsonValue);
-        } else {
-          return ([
-            {
-              date: "none",
-              numKook: 0,
-              numKangaroos: 0,
-              numEmus: 0,
-              numNursery: 0,
-              staffOnDuty: [],
-            },
-          ]);
-        }
-      } catch (e) {
-        console.log(e);
-        return e;
+  const getData = async () => {
+    try {
+      let jsonValue = await AsyncStorage.getItem("staffPicked");
+      if (jsonValue !== null) {
+        return JSON.parse(jsonValue);
+      } else {
+        return ([]);
       }
-    };
+    } catch (e) {
+      console.log(e);
+      return e;
+    }
+  };
+
+  useEffect(() => {
+    if (resetting) {
+      getData().then(res=>{console.log(res); return}).catch(err=>{console.log(err); return})
+    }
+    if (isFocused) {
+      setLoading(true)
     getData()
       .then((val) => {
-        setLoading(false);
-        setInfo(val)
+        setStaffOnDuty(val)
+    UserService.getClassData().then(res=>{
+      setLoading(false)
+      if (!res.data[0]) {
+        return;
+      }
+      setInfo(res.data[0])
+    }).catch(err=>setLoading(false))
+
       })
-      .catch((e) => console.log("failed"));
-  }, [props, isFocused]);
+      .catch((e) => setLoading(false) );
+    }
+  }, [props, isFocused, resetting]);
+
 
 
 
   const reset = async () => {
-    setInfo([
+    setInfo(
       {
-        date: "none",
-        numNursery: 0,
-        numKook: 0,
-        numKangaroos: 0,
-        numEmus: 0,
-        staffOnDuty: [],
+        dateof: "none",
+        timeof: "",
+        numkook: 0,
+        numkang: 0,
+        numemu: 0,
+        numkoala: 0,
       },
-    ]);
+    );
     setStaffOnDuty([]);
     try {
       let item = await AsyncStorage.setItem("childrenCount", "");
+      let otherItem = await AsyncStorage.setItem("staffPicked", "");
+
       return item;
     }
     catch (err) {
@@ -85,14 +94,22 @@ export const Home = (props) => {
   };
 
   const staffNeeded = calcRatio(
-    info[info.length - 1].numNursery,
-    info[info.length - 1].numKook,
-    info[info.length - 1].numEmus + info[info.length - 1].numKangaroos
+    info.numkoala,
+    info.numkook,
+    info.numemu + info.numkang
   );
 
-  if (fontLoaded && !loading) {
-    return (
+
+return (
+
+
       <View style={styles.container}>
+          {loading && <AnimatedLoader
+    visible={true}
+    overlayColor="rgba(255,255,255,0.75)"
+    source={require("./StaffDirectory/loader.json")}
+    animationStyle={styles.lottie}
+    speed={1} /> }
         <View style={styles.topPanel}>
           <Image source={require("./assets/kindyLogo.png")} />
           <StaffPanel
@@ -108,44 +125,35 @@ export const Home = (props) => {
           navigate={props.navigation.navigate}
           setInfo={setInfo}
           info={info}
+          setResetting={setResetting}
           staffOnDuty={staffOnDuty}
           setStaffOnDuty={setStaffOnDuty}
           reset={reset}
         />
       </View>
     );
-  } else {
-    return <Text>Font not loaded</Text>;
-  }
+
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: "#f3f3f3",
     justifyContent: "space-around",
-    paddingTop: "0%",
+    paddingLeft: "2%",
+    paddingRight: "2%",
+    paddingTop: "3%",
+
   },
-  widgetContainer: {
-    flex: 0.4,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+  lottie: {
+    width: 100,
+    height: 100
   },
   topPanel: {
     flex: 0.15,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingLeft: "2%",
-    paddingTop: "2%",
-  },
-  statsContainer: {
-    backgroundColor: "green",
-    flex: 0.2,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: "5%",
   },
   text: {
     fontFamily: "mainFont",
@@ -158,13 +166,14 @@ const styles = StyleSheet.create({
     fontFamily: "mainFont",
   },
   widget: {
+    backgroundColor: "#f8f8f8",
     width: "30%",
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
     textAlign: "center",
     backgroundColor: "white",
-    borderRadius: 20,
+    borderRadius: 40,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

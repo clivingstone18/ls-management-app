@@ -3,14 +3,13 @@ import React from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
 import { UpdateInfo } from "./UpdateInfo";
 import { Home } from "./Home";
-import { PrintSheet } from "./PrintSheet";
+import { DateSheetTimeChanger } from "./DateSheetTimeChanger";
 import { ChangeTeacher } from "./ChangeTeacher";
-import { DiplomaInfo } from "./DiplomaInfo";
+import { StaffDirectory } from "./StaffDirectory/StaffDirectory";
 
 import { NavigationContainer } from "@react-navigation/native";
 import {
   createStackNavigator,
-  HeaderBackButton,
 } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
@@ -21,9 +20,9 @@ function App() {
       <Stack.Navigator>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
-        <Stack.Screen name="PrintSheet" component={PrintSheet} />
+        <Stack.Screen name="PrintSheet" component={DateSheetTimeChanger} />
         <Stack.Screen name="ChangeTeacher" component={ChangeTeacher} />
-        <Stack.Screen name="DiplomaInfo" component={DiplomaInfo} />
+        <Stack.Screen name="StaffDirectory" component={StaffDirectory} />
       </Stack.Navigator>
     </NavigationContainer>
   );

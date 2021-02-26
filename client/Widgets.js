@@ -1,30 +1,65 @@
-import React from "react";
-import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
+import React, {useState} from "react";
+import { View, StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import {
   faEdit,
   faCopy,
-  faSignOutAlt,
   faUserAlt,
   faInfo,
   faHome,
+  faCaretRight,
+  faCaretLeft,
+  faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import { print } from "./print";
 
+
+const resetData = async (props) => {
+  props.setResetting(true)
+  try {
+    await AsyncStorage.setItem("staffPicked", "")
+    props.setResetting(false)
+    return "RESET";
+  } catch (e) {
+    console.log(e)
+    alert("Error saving, try again");
+  }
+};
+
+
 export const Widgets = (props) => {
+  const [page, setPage] = useState(1)
 
   const handlePrint = () => {
-    if (props.info[props.info.length - 1].date !== "none") {
+    if (props.info.dateof !== "none") {
       print(props.info).then(res=>console.log(res)).catch(err=>console.log(err))
     } else {
       alert("Nothing to print yet");
     }
   };
 
-
-
   return (
+    <View style={styles.container}>
+      <View style={styles.caratContainer}>      
+
+      { page === 2 && 
+<TouchableOpacity onPress={()=>setPage(1)}>
+ <FontAwesomeIcon
+ style={{ alignSelf: "center" }}
+ icon={faCaretLeft}
+ color="#69a3ff"
+  size={32}
+  />
+  </TouchableOpacity>  
+} 
+</View>
     <View style={styles.widgetContainer}>
+      
+      { 
+      (page === 1) ? 
+      <>
       <View style={styles.widget}>
         <TouchableOpacity
           onPress={() =>
@@ -47,13 +82,10 @@ export const Widgets = (props) => {
       </View>
       <View style={styles.widget}>
         <TouchableOpacity
-          onPress={() =>
-            props.info.date !== "none"
-              ? props.navigate("ChangeTeacher", {
+          onPress={() => props.navigate("ChangeTeacher", {
                   staffOnDuty: props.staffOnDuty,
                   setStaffOnDuty: props.setStaffOnDuty,
                 })
-              : alert(props.info.date)
           }
         >
           <Text style={styles.text}>Update staff on duty</Text>
@@ -67,15 +99,12 @@ export const Widgets = (props) => {
       <View style={styles.widget}>
         <TouchableOpacity
           onPress={() =>
-            props.info[props.info.length - 1].date !== "none"
-              ? props.navigate("PrintSheet", {
-                  info: props.info,
-                  staffOnDuty: props.staffOnDuty,
-                })
+            props.info.dateof !== "none"
+              ? props.navigate("PrintSheet")
               : alert("Log some information first")
           }
         >
-          <Text style={styles.text}>Open ratio checker sheet</Text>
+          <Text style={styles.text}>View ratio sheet</Text>
           <FontAwesomeIcon
             style={{ alignSelf: "center" }}
             icon={faCopy}
@@ -84,23 +113,11 @@ export const Widgets = (props) => {
         </TouchableOpacity>
       </View>
       <View style={styles.widget}>
-        <TouchableOpacity onPress={handlePrint}>
-          <Text style={styles.text}>Print ratio checker sheet</Text>
-          <FontAwesomeIcon
-            icon={faSignOutAlt}
-            style={{ alignSelf: "center" }}
-            size={32}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.widget}>
         <TouchableOpacity
           onPress={() =>
-            props.info.date !== "none"
-              ? props.navigate("DiplomaInfo", {
+ props.navigate("StaffDirectory", {
                   staffOnDuty: props.staffOnDuty,
                 })
-              : alert(props.info.date)
           }
         >
           <Text style={styles.text}>Update staff directory</Text>
@@ -111,35 +128,34 @@ export const Widgets = (props) => {
           />
         </TouchableOpacity>
       </View>
+     </> : 
+      <>
+     
+      <View style={styles.widget}>
+        <TouchableOpacity
+          onPress={() =>
+            props.info.dateof !== "none"
+              ? props.navigate("DiplomaInfo", {
+                  staffOnDuty: props.staffOnDuty,
+                })
+              : alert(props.info.date)
+          }
+        >
+          <Text style={styles.text}>View weekly data</Text>
+          <FontAwesomeIcon
+            style={{ alignSelf: "center" }}
+            icon={faBookOpen}
+            size={32}
+          />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.widget}>
         <TouchableOpacity
           disabled={props.info.length === 1}
-          onPress={() =>
-            Alert.alert(
-              "Before clearing all...",
-              "Would you like to print the ratio sheet?",
-              [
-                {
-                  text: "Yes",
-                  onPress: () => {
-                    handlePrint();
-                    props.reset();
-                  },
-                },
-                {
-                  text: "No",
-                  onPress: () => props.reset(),
-                },
-                {
-                  text: "Cancel",
-                  onPress: () => console.log("Cancel Pressed"),
-                  style: "cancel",
-                },
-              ]
-            )
-          }
+          onPress={() => resetData(props)}
         >
-          <Text style={styles.text}>Clear data</Text>
+          <Text style={styles.text}>Reset staff on duty</Text>
           <FontAwesomeIcon
             style={{ alignSelf: "center" }}
             icon={faHome}
@@ -147,24 +163,47 @@ export const Widgets = (props) => {
           />
         </TouchableOpacity>
       </View>
+      </>
+}
+
+</View>
+<View style={styles.caratContainer}>      
+{ page === 1 && 
+<TouchableOpacity onPress={()=>setPage(2)}>
+ <FontAwesomeIcon
+ style={{ alignSelf: "center" }}
+ icon={faCaretRight}
+ color="#69a3ff"
+  size={32}
+  />
+  </TouchableOpacity>  
+} 
+</View>
     </View>
+    
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#D3D3D3",
-    justifyContent: "space-evenly",
+    flex: 0.4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  caratContainer: {
+    flex: 0.05,
+    alignItems: "center",
+    justifyContent: "space-around",
   },
 
   widgetContainer: {
-    flex: 0.4,
+    flex: 0.95,
     flexDirection: "row",
     justifyContent: "space-evenly",
     flexWrap: "wrap",
+    alignItems: "center",
+    paddingLeft: "0%"
   },
-
   text: {
     fontFamily: "mainFont",
     fontSize: 25,
@@ -177,22 +216,22 @@ const styles = StyleSheet.create({
   },
   widget: {
     height: "35%",
-    width: "30%",
+    width: "40%",
     padding: "2.5%",
     alignItems: "center",
     justifyContent: "space-evenly",
     textAlign: "center",
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius: 15,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 12,
+      height: 5,
     },
     marginBottom: "5%",
-    shadowOpacity: 0.58,
-    shadowRadius: 16.0,
+    shadowOpacity: 0.5,
+    shadowRadius: 5.0,
     paddingLeft: "2%",
-    elevation: 24,
+    elevation: 10,
   },
 });

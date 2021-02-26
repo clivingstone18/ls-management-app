@@ -6,6 +6,7 @@ export const ButtonAll = (props) => {
     <Button
       title={props.title}
       background="#f194ff"
+      color={props.color}
       onPress={props.handlePress}
     />
   );

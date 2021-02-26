@@ -3,13 +3,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
   Button,
+  View,
 } from "react-native";
 import { TeacherToggle } from "./TeacherToggle.js";
+import UserService from "./services/UserService"
+import AnimatedLoader from "react-native-animated-loader";
 
 export const ChangeTeacher = (props) => {
   const [staffPicked, setStaffPicked] = useState(
     props.route.params.staffOnDuty
   );
+  const [loading, setLoading] = useState(true);
   const [submit, setSubmit] = useState(false);
   const [staffList, setStaffList] = useState([]);
 
@@ -19,10 +23,32 @@ export const ChangeTeacher = (props) => {
     setSubmit(true);
   };
 
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("staffPicked", jsonValue)
+      return value;
+    } catch (e) {
+      alert("Error saving, try again");
+    }
+  };
+
+
+
+  useEffect(() => {
+    setLoading(true)
+    UserService.getAllStaff()
+      .then((res) => {
+        setLoading(false)
+        setStaffList(res.data);
+      })
+      .catch((e) => setLoading(false));
+  }, []);
+
   useEffect(() => {
     const getData = async () => {
       try {
-        let jsonValue = await AsyncStorage.getItem("staffInfo");
+        let jsonValue = await AsyncStorage.getItem("staffPicked");
         if (jsonValue !== null) {
           return JSON.parse(jsonValue);
         } else {
@@ -34,17 +60,35 @@ export const ChangeTeacher = (props) => {
     };
     getData()
       .then((val) => {
-        setStaffList(val);
+        setStaffPicked(val);
       })
       .catch((e) => console.log("failed"));
   }, []);
 
+
+
+
+
+
+
+
+
+
+
+
   useEffect(() => {
     if (submit === true) {
-      props.route.params.setStaffOnDuty(staffPicked);
-      props.navigation.goBack();
+      storeData(staffPicked).then(
+        res=>{
+          props.route.params.setStaffOnDuty(res)
+          props.navigation.goBack()
+        })
+        .catch(err=>console.log(err))
+
+
     }
   }, [submit]);
+
 
   const handleRemove = (index) => {
     if (staffPicked.length < 2) {
@@ -52,19 +96,11 @@ export const ChangeTeacher = (props) => {
       return 0;
     }
 
-    console.log("STAFF TO DELETE");
-    console.log(staffList[index]);
-    console.log("ALL STAFF PRESENT");
-    console.log(staffPicked);
-
     const newList = staffPicked.filter(
       (staff) =>
-        staff.firstName !== staffList[index].firstName &&
-        staff.firstName !== staffList[index].firstName
+        staff.firstname !== staffList[index].firstname &&
+        staff.lastname !== staffList[index].lastname
     );
-    console.log("NEW LIST");
-    console.log(newList);
-
     setStaffPicked(newList);
     return 1;
   };
@@ -73,8 +109,8 @@ export const ChangeTeacher = (props) => {
     for (let j = 0; j < staffPicked.length; j++) {
       if (
         i != j &&
-        value.firstName === staffPicked[j].firstName &&
-        value.lastName === staffPicked[j].lastName
+        value.firstname === staffPicked[j].firstname &&
+        value.lastname === staffPicked[j].lastname
       ) {
         return;
       }
@@ -89,6 +125,13 @@ export const ChangeTeacher = (props) => {
   };
 
   return (
+    <View style={styles.container}>
+                {loading ? <AnimatedLoader
+    visible={true}
+    overlayColor="rgba(255,255,255,0.75)"
+    source={require("./StaffDirectory/loader.json")}
+    animationStyle={styles.lottie}
+    speed={1} />  :
     <>
       {staffList.map((staff, index) => {
         return (
@@ -100,24 +143,25 @@ export const ChangeTeacher = (props) => {
             onDuty={
               staffPicked.filter(
                 (mem) =>
-                  mem.firstName === staff.firstName &&
-                  mem.lastName === staff.lastName
+                  mem.firstname === staff.firstname &&
+                  mem.lastname === staff.lastname
               ).length > 0
             }
             handleRemove={handleRemove}
           />
         );
       })}
-      <Button title="Submit changes" onPress={handleSubmit}></Button>
-    </>
+      </>}
+      <Button title="Save changes" onPress={handleSubmit}></Button>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     padding: "3.5%",
+    padding: "10%",
     flex: 1,
-    backgroundColor: "#FAFAFA",
   },
   form: {
     backgroundColor: "white",
@@ -129,6 +173,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: "1%",
     alignSelf: "center",
+  },
+  lottie: {
+    width: 100,
+    height: 100
   },
   stat: {
     flex: 1,

@@ -1,11 +1,7 @@
 import * as Print from "expo-print";
-import { timeToStr, dateToStr } from "./TimeKeeper";
-import { calcRatio } from "./calcRatio";
-
-export const print = async (info) => {
+import moment from "moment"
+export const print = async (info, date) => {
   return new Promise((resolve, reject) =>  {
-  info = info.slice(1);
-
   const headers = [
     "Time",
     "# Nursery",
@@ -19,15 +15,16 @@ export const print = async (info) => {
   ];
 
   const getInfoAsStr = (info) => {
-    let time = timeToStr(info.date);
-    let nursery = info.numNursery;
-    let kookaburras = info.numKook;
-    let emus = info.numEmus;
-    let kangaroos = info.numKangaroos;
-    let numChildren = nursery + kookaburras + emus + kangaroos;
-    let numStaff = info.staffOnDuty.length;
-    let staffRequired = calcRatio(nursery, kookaburras, emus + kangaroos);
-    let staffNames = processNames(info.staffOnDuty);
+    let time = info[0]
+    let nursery = info[1];
+    let kookaburras = info[2];
+    let emus = info[3];
+    let kangaroos = info[4];
+    let numChildren = info[5]
+    let numStaff = info[8].split("\n").length
+    let staffRequired = info[7]
+    let staffNames = info[8].split("\n").join(", ")
+
     return `<td>${time}</td>
       <td>${nursery}</td>
       <td>${kookaburras}</td>
@@ -39,17 +36,6 @@ export const print = async (info) => {
       <td>${staffNames}</td>`;
   };
 
-  const processNames = (staff) => {
-    let initials = "";
-    for (let i = 0; i < staff.length; i++) {
-      initials += staff[i].firstName[0] + "." + staff[i].lastName[0];
-      if (i != staff.length - 1) {
-        initials += "\n";
-      }
-    }
-    return initials;
-  };
-
   let { printerName, printerUrl } = Print.selectPrinterAsync().catch((e) =>
     console.log("fail")
   );
@@ -59,13 +45,12 @@ export const print = async (info) => {
     'kindylogo" src="https://2syco449tvc32lbc983jscyx-wpengine.netdna-ssl.com/wp-content/uploads/2018/11/little-scribblers-logo.svg"/>' +
     "<br>" +
     "<h2>Ratio Check for " +
-    dateToStr(info[0].date) +
+    moment(date).format("dddd, MMMM Do YYYY") +
     "</h2><table><thead><tr>" +
     headers.map((header) => "<th>" + header + "</th>").join("") +
     "</tr></thead><tbody>" +
     info.map((element) => "<tr>" + getInfoAsStr(element) + "</tr>").join("") +
     "</tbody></table></body>";
-
   let { pdfURI, numPages, base64 } = Print.printToFileAsync({
     html: html,
     width: 612,
@@ -82,6 +67,7 @@ export const print = async (info) => {
       printerUrl: printerUrl,
       orientation: Print.Orientation.portrait,
     });
+    console.log(printedFile)
     resolve(printedFile)
   }
   catch (err) {
