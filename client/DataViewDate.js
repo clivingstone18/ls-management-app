@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
-  Button,
   View,
   Text,
   Switch,
@@ -9,19 +8,22 @@ import {
 import UserService from "./services/UserService"
 import moment from "moment"
 import {DataChart} from "./DataChart"
+import AnimatedLoader from "react-native-animated-loader";
+
 export const DataViewDate = (props) => { 
     const [loading, setLoading] = useState(false);
     const [mornTimes, setMornTimes] = useState([]);
     const [mornCounts, setMornCounts] = useState([]);
     const [afternoonTimes, setAfternoonTimes] = useState([]);
     const [afternoonCounts, setAfternoonCounts] = useState([]);
-    const [morn, setMorn] = useState(false);
+    const [morn, setMorn] = useState(true);
 
     const toggleSwitch = () => {
       setMorn(!morn);
     };
-  
 
+    let date = props.date;
+  
   useEffect(() => {
     setLoading(true)
     // api call to get most recent
@@ -46,10 +48,19 @@ export const DataViewDate = (props) => {
         setMornCounts(processedInfoMorning.map(i=>i.numChildren));
         setAfternoonTimes(processedInfoAfternoon.map(i=>i.time));
         setAfternoonCounts(processedInfoAfternoon.map(i=>i.numChildren));
+        setLoading(false);
     }).catch(err=>console.log(err))
-}, [props])
+}, [date])
 
-return(<View>
+return(
+      loading ? <AnimatedLoader
+        visible={true}
+        overlayColor="rgba(255,255,255,0.75)"
+        source={require("./StaffDirectory/loader.json")}
+        animationStyle={styles.lottie}
+        speed={1} />
+         : 
+         <View>
     
     <Text style={styles.titleText}>Data for {moment(props.date).format(
     "dddd, MMMM Do YYYY"

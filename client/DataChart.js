@@ -1,26 +1,24 @@
 import React from "react";
 import {
-    StyleSheet,
-    Button,
     View,
     Dimensions,
     Text,
   } from "react-native";
 import {
     LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
+
   } from "react-native-chart-kit";
 
   const screenWidth = Dimensions.get("window").width * 0.9;
   const screenHeight = Dimensions.get("window").height * 0.7;
 
   export const DataChart = (props) => {
-      if (!props.y.length) {
-          return <View><Text>HI</Text></View>
+      if (props.y.length == 0) {
+          return <View><Text style={{
+            fontFamily: "mainFont",
+            fontSize: 25,
+            marginBottom: "5%",
+          }}>No data recorded.</Text></View>
       }
       if (props.y.length) {
       return(
@@ -55,7 +53,7 @@ import {
     const chartConfig = {
         backgroundColor: "gray",
         backgroundGradientFrom: "navy",
-        backgroundGradientTo: "#d3d3d3",
+        backgroundGradientTo: "#f3f3f3",
         decimalPlaces: 0, // optional, defaults to 2dp
         color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
         labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,

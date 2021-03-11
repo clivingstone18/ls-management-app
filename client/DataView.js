@@ -4,7 +4,6 @@ import { StyleSheet, Text, View, Dimensions, ScrollView, TouchableOpacity } from
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCaretLeft , faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import * as ScreenOrientation from 'expo-screen-orientation';
-import AnimatedLoader from "react-native-animated-loader";
 import {DataViewDate} from "./DataViewDate";
 
 const { height } = Dimensions.get("window");
@@ -19,9 +18,7 @@ export const DataView = (props) => {
     };
 
     return(
-
-
-        <ScrollView
+    <ScrollView
         style={{ flex: 1 }}
         onContentSizeChange={onContentSizeChange}
         scrollEnabled={scrollEnabled}
