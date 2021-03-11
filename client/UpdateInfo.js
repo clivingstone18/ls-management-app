@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 5,
     paddingLeft: "0.5%",
-    marginBottom: "3%",
+    marginBottom: "2%",
     flexDirection: "row",
     shadowColor: "#000",
     shadowOpacity: 0.2,

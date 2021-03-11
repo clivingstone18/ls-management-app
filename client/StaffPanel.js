@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUserAlt } from "@fortawesome/free-solid-svg-icons";
 
 export const StaffPanel = (props) => {
   let color;
-
   props.staff.length < props.staffNeeded ? (color = "red") : (color = "green");
   props.staffNeeded === 0 ? (color = "black") : null;
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.staffIcon}>

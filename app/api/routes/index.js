@@ -64,8 +64,9 @@ router.get('/api/classData/:date/get', (req, res, next) => {
   
   ; 
   `
-
-  connectToDB(queryString).then(response=>{res.send(response)}).catch(err=>{
+  connectToDB(queryString).then(response=>{
+    res.send(response)
+  }).catch(err=>{
     res.send(err)
   })
 });

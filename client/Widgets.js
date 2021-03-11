@@ -1,7 +1,6 @@
 import React, {useState} from "react";
-import { View, StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   faEdit,
@@ -13,32 +12,10 @@ import {
   faCaretLeft,
   faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
-import { print } from "./print";
-
-const resetData = async (props) => {
-  props.setRefresh(true)
-  props.setResetting(true)
-  try {
-    await AsyncStorage.setItem("staffPicked", "")
-    props.setResetting(false)
-    return "RESET";
-  } catch (e) {
-    console.log(e)
-    alert("Error saving, try again");
-  }
-};
-
+ 
 
 export const Widgets = (props) => {
   const [page, setPage] = useState(1)
-
-  const handlePrint = () => {
-    if (props.info.dateof !== "none") {
-      print(props.info).then(res=>{return}).catch(err=>console.log(err))
-    } else {
-      alert("Nothing to print yet");
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -118,7 +95,7 @@ export const Widgets = (props) => {
       <View style={styles.widget}>
         <TouchableOpacity
           disabled={props.info.length === 1}
-          onPress={() => resetData(props)}
+          onPress={props.resetData}
         >
           <Text style={styles.text}>Reset staff on duty</Text>
           <FontAwesomeIcon
@@ -153,10 +130,7 @@ export const Widgets = (props) => {
      
       <View style={styles.widget}>
         <TouchableOpacity
-          onPress={() => props.navigate("DataView", {
-                })
-          }
-        >
+          onPress={() => props.navigate("DataView", {})}>
           <Text style={styles.text}>View daily data</Text>
           <FontAwesomeIcon
             style={{ alignSelf: "center" }}
@@ -209,8 +183,8 @@ const styles = StyleSheet.create({
     paddingLeft: "0%"
   },
   text: {
-    fontFamily: "mainFont",
     fontSize: 25,
+    fontWeight: '200',
     marginBottom: "5%",
   },
   stat: {

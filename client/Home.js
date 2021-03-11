@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Clock from "./Clock";
-import { View, StyleSheet, Text, Image, ScrollView} from "react-native";
+import { View, StyleSheet, Text, Image} from "react-native";
 import { useFonts } from "expo-font";
 import { calcRatio } from "./calcRatio";
 import { Stats } from "./Stats";
@@ -44,6 +44,18 @@ export const Home = (props) => {
       return e;
     }
   };
+  
+  const resetData = async () => {
+  setRefresh(true)
+  setResetting(true)
+  try {
+    await AsyncStorage.setItem("staffPicked", "")
+    setStaffOnDuty([]);
+    return "RESET";
+  } catch (e) {
+    alert("Error saving, try again");
+  }
+};
 
   useEffect(() => {
     if (resetting) {
@@ -69,33 +81,6 @@ export const Home = (props) => {
     }
   }, [props, isFocused]);
 
-
-
-
-  const reset = async () => {
-    setInfo(
-      {
-        dateof: "none",
-        timeof: "",
-        numkook: 0,
-        numkang: 0,
-        numemu: 0,
-        numkoala: 0,
-      },
-    );
-    setStaffOnDuty([]);
-    try {
-      let item = await AsyncStorage.setItem("childrenCount", "");
-      let otherItem = await AsyncStorage.setItem("staffPicked", "");
-
-      return item;
-    }
-    catch (err) {
-      return err
-    }
-
-  };
-
   const staffNeeded = calcRatio(
     info.numkoala,
     info.numkook,
@@ -104,9 +89,8 @@ export const Home = (props) => {
 
 
 return (
-
-
-      <View style={styles.container}>
+  fontLoaded ?
+   <View style={styles.container}>
           {loading && <AnimatedLoader
     visible={true}
     overlayColor="rgba(255,255,255,0.75)"
@@ -132,12 +116,11 @@ return (
           setResetting={setResetting}
           staffOnDuty={staffOnDuty}
           setStaffOnDuty={setStaffOnDuty}
-          reset={reset}
+          resetData={resetData}
         />
       </View>
-    );
-
-};
+          : <Text>LOADING</Text>)
+}
 
 const styles = StyleSheet.create({
   container: {

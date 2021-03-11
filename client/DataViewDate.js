@@ -1,28 +1,51 @@
 import React, { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
   Button,
   View,
   Text,
+  Switch,
 } from "react-native";
 import UserService from "./services/UserService"
 import moment from "moment"
+import {DataChart} from "./DataChart"
 export const DataViewDate = (props) => { 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [mornTimes, setMornTimes] = useState([]);
+    const [mornCounts, setMornCounts] = useState([]);
+    const [afternoonTimes, setAfternoonTimes] = useState([]);
+    const [afternoonCounts, setAfternoonCounts] = useState([]);
+    const [morn, setMorn] = useState(false);
+
+    const toggleSwitch = () => {
+      setMorn(!morn);
+    };
+  
 
   useEffect(() => {
     setLoading(true)
-    // api call to get most recent 
+    // api call to get most recent
     let date = moment(props.date).format("YYYY-MM-DD")
     UserService.getClassDataOnDate(date).then(res=>{
         let info = res.data[0].rows
-        let processedInfo = info.map(i => [moment(i.timeof, "HH:mm:ss").format("hh:mm A"), i.numemu+i.numkang+i.numkoala+i.numkook])
-        console.log(processedInfo)
 
-
-
-
+        // process info 
+        let processedInfoMorning = [];
+        let processedInfoAfternoon = [];
+        for (let i=0; i < info.length; i++) {
+          let currHour = moment(info[i].timeof, "HH:mm:ss").format("HH");
+          let data = {time: moment(info[i].timeof, "HH:mm:ss").format("hh:mm A"), numChildren: info[i].numemu+info[i].numkang+info[i].numkoala+info[i].numkook}
+          if (currHour < 12) {
+            processedInfoMorning.push(data);
+          }
+          else {
+            processedInfoAfternoon.push(data);
+          }
+        }
+        setMornTimes(processedInfoMorning.map(i=>i.time));
+        setMornCounts(processedInfoMorning.map(i=>i.numChildren));
+        setAfternoonTimes(processedInfoAfternoon.map(i=>i.time));
+        setAfternoonCounts(processedInfoAfternoon.map(i=>i.numChildren));
     }).catch(err=>console.log(err))
 }, [props])
 
@@ -31,7 +54,53 @@ return(<View>
     <Text style={styles.titleText}>Data for {moment(props.date).format(
     "dddd, MMMM Do YYYY"
 
-)}</Text></View>)
+)}</Text>
+{morn ? 
+    <View style={{alignItems: "center"}}>
+    <Text style={{
+    fontFamily: "mainFont",
+    fontSize: 25,
+    marginBottom: "5%",
+  }}>{"Morning "} <Switch
+  trackColor={{ false: "#767577", true: "#81b0ff" }}
+  thumbColor={"#f5dd4b"}
+  ios_backgroundColor="#3e3e3e"
+  onValueChange={toggleSwitch}
+  value={morn}
+  style={{paddingBottom: 0, paddingTop: 0, alignSelf: "center"}}
+  
+  /></Text>
+
+  <DataChart x={mornTimes} y={mornCounts} title={"Morning"}/>
+  </View>
+:
+
+<View style={{alignItems: "center"}}>
+<Text style={{
+    fontFamily: "mainFont",
+    fontSize: 25,
+    marginBottom: "5%",
+  }}>{"Afternoon "}
+  
+  <Switch
+trackColor={{ false: "#767577", true: "#81b0ff" }}
+thumbColor={"#f5dd4b"}
+ios_backgroundColor="#3e3e3e"
+onValueChange={toggleSwitch}
+value={morn}
+style={{paddingBottom: 0, paddingTop: 0, alignSelf: "center"}}
+
+/></Text>
+
+
+<DataChart x={afternoonTimes} y={afternoonCounts} title={"Afternoon"}/>
+</View>
+
+
+}
+
+
+</View>)
     }
 
 

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, View, Dimensions, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Dimensions, ScrollView, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCaretLeft , faCaretRight} from "@fortawesome/free-solid-svg-icons";
-import { TeacherToggle } from "./TeacherToggle.js";
-import UserService from "./services/UserService"
+import * as ScreenOrientation from 'expo-screen-orientation';
 import AnimatedLoader from "react-native-animated-loader";
-import {DataViewDate} from "./DataViewDate"
+import {DataViewDate} from "./DataViewDate";
+
 const { height } = Dimensions.get("window");
 
 export const DataView = (props) => {
@@ -14,11 +14,10 @@ export const DataView = (props) => {
     const scrollEnabled = screenHeight > height;
     const [screenHeight, setScreenHeight] = useState(0);
 
-
-const onContentSizeChange = (contentWidth, contentHeight) => {
+    const onContentSizeChange = (contentWidth, contentHeight) => {
     setScreenHeight(contentHeight);
-  };
-    
+    };
+
     return(
 
 
@@ -53,7 +52,9 @@ const onContentSizeChange = (contentWidth, contentHeight) => {
   
   </View>
   <DataViewDate date={date}/>
-            </View>
+  </View>
+
+
       </ScrollView>
 
 
@@ -85,7 +86,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center" 
     },
-    text: { margin: 6 },
+    text: { 
+      margin: 6 },
     scrollview: {
       flexGrow: 1,
     },

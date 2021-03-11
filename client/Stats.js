@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { calcRatio } from "./calcRatio";
 
-export const Stats = ({ info, insufficientStaff }) => {
+export const Stats = ({ info }) => {
   return (
     <View style={styles.statsContainer}>
       <View style={styles.stat}>
