@@ -1,4 +1,4 @@
-const { Pool, Client } = require('pg')
+const { Pool } = require('pg')
 
 async function connectToDB(queryString) {
     return new Promise((resolve, reject) => {    
@@ -11,8 +11,11 @@ async function connectToDB(queryString) {
         ssl: { rejectUnauthorized: false }})
       
       pool.connect((err, client, release) => {
-        if (err) {
+        if (err ) {
           reject(err)
+        }
+        if (!client) {
+          reject("No client")
         }
         client.query(queryString, (err, result) => {
           release()

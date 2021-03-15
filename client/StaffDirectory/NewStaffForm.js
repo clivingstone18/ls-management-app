@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext} from "react";
 import {
   View,
   StyleSheet,
@@ -7,12 +7,13 @@ import {
   TextInput,
 } from "react-native";
 import Emoji from "react-native-emoji";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ButtonAll } from "../ButtonAll";
 import UserService from "../services/UserService"
 import AnimatedLoader from "react-native-animated-loader";
+import {StaffContext} from "./StaffContext";
 
 export const NewStaffForm = (props) => {
+    const {setAdding} = useContext(StaffContext);
     const [inputFirstName, setInputFirstName] = useState("")
     const [inputLastName, setInputLastName] = useState("")
     const [inputDiploma, setInputDiploma] = useState("")
@@ -23,7 +24,6 @@ const resetInput = () => {
     setInputLastName("");
     setInputDiploma(null);
   };
-
 
 const handleAdd = () => {
     setLoading(true);
@@ -36,11 +36,13 @@ const handleAdd = () => {
       lastName: inputLastName,
       hasDiploma: inputDiploma,
     };
+
     UserService.addNewStaff(newStaffInfo).then(res=>{
         setLoading(false)
         resetInput();
+        setAdding(true);
         props.navigation.goBack();
-    }).catch(err=>{console.log(err);setLoading(false)})
+    }).catch(err=>{console.log(err); setLoading(false)})
   };
 
   return(

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Clock from "./Clock";
-import { View, StyleSheet, Text, Image} from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 import { useFonts } from "expo-font";
 import { calcRatio } from "./calcRatio";
 import { Stats } from "./Stats";
@@ -8,28 +8,44 @@ import { Widgets } from "./Widgets";
 import { StaffPanel } from "./StaffPanel";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
-import UserService from "./services/UserService"
+import UserService from "./services/UserService";
 import AnimatedLoader from "react-native-animated-loader";
 
 export const Home = (props) => {
   const isFocused = useIsFocused();
-  const [loading, setLoading] = useState(false)
-  const [resetting, setResetting] = useState(false)
-  const [refresh, setRefresh] = useState(true)
-  const [info, setInfo] = useState(
-    {
-      dateof: "none",
-      timeof: "",
-      numkook: 0,
-      numkang: 0,
-      numemu: 0,
-      numkoala: 0,
-    },
-  );
+  const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [refresh, setRefresh] = useState(true);
+  const [holidayMode, setHolidayMode] = useState(false);
+  const [info, setInfo] = useState({
+    dateof: "none",
+    timeof: "",
+    numkook: 0,
+    numkang: 0,
+    numemu: 0,
+    numkoala: 0,
+    numcroc: 0,
+  });
   const [staffOnDuty, setStaffOnDuty] = useState([]);
+  const [staff, setStaff] = useState([]);
   const [fontLoaded] = useFonts({
     mainFont: require("./assets/fonts/Roboto-Thin.ttf"),
   });
+
+  const getHolMode = async () => {
+    try {
+      let val = await AsyncStorage.getItem("holMode");
+      if (val !== null) {
+        if (val === "true") return true;
+        else return false;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      console.log(e);
+      return e;
+    }
+  };
 
   const getData = async () => {
     try {
@@ -37,90 +53,106 @@ export const Home = (props) => {
       if (jsonValue !== null) {
         return JSON.parse(jsonValue);
       } else {
-        return ([]);
+        return [];
       }
     } catch (e) {
       console.log(e);
       return e;
     }
   };
-  
+
   const resetData = async () => {
-  setRefresh(true)
-  setResetting(true)
-  try {
-    await AsyncStorage.setItem("staffPicked", "")
-    setStaffOnDuty([]);
-    return "RESET";
-  } catch (e) {
-    alert("Error saving, try again");
-  }
-};
+    setRefresh(true);
+    setResetting(true);
+    try {
+      await AsyncStorage.setItem("staffPicked", "");
+      setStaffOnDuty([]);
+      return "RESET";
+    } catch (e) {
+      alert("Error saving, try again");
+    }
+  };
 
   useEffect(() => {
     if (resetting) {
-      setResetting(false)
-      getData().then(res=>{return}).catch(err=>{console.log(err); return})
+      setResetting(false);
+      getData()
+        .then((res) => {
+          return;
+        })
+        .catch((err) => {
+          console.log(err);
+          return;
+        });
     }
+ 
     if (isFocused && refresh) {
-      setLoading(true)
-      setRefresh(false)
-    getData()
-      .then((val) => {
-        setStaffOnDuty(val)
-    UserService.getClassData().then(res=>{
-      setLoading(false)
-      if (!res.data[0]) {
-        return;
-      }
-      setInfo(res.data[0])
-    }).catch(err=>setLoading(false))
-
-      })
-      .catch((e) => setLoading(false) );
+      let promises = [getData(), UserService.getClassData(), UserService.getAllStaff()]
+      setLoading(true);
+      setRefresh(false);
+      Promise.all(promises).then(res=>{
+        setStaffOnDuty(res[0]);
+        setInfo(res[1].data[0]);
+        setStaff(res[2].data);
+        setLoading(false);
+      }).catch(err=>console.log(err))
     }
   }, [props, isFocused]);
+
+  useEffect(() => {
+    // initial API call.....
+    getHolMode()
+    .then(res => setHolidayMode(res))
+    .catch(e=>console.log(e))
+}, []);
 
   const staffNeeded = calcRatio(
     info.numkoala,
     info.numkook,
-    info.numemu + info.numkang
+    info.numemu + info.numkang + info.numcroc
   );
 
-
-return (
-  fontLoaded ?
-   <View style={styles.container}>
-          {loading && <AnimatedLoader
-    visible={true}
-    overlayColor="rgba(255,255,255,0.75)"
-    source={require("./StaffDirectory/loader.json")}
-    animationStyle={styles.lottie}
-    speed={1} /> }
-        <View style={styles.topPanel}>
-          <Image source={require("./assets/kindyLogo.png")} />
-          <StaffPanel
-            staff={staffOnDuty}
-            navigate={props.navigation.navigate}
-            setStaffOnDuty={setStaffOnDuty}
-            staffNeeded={staffNeeded}
-          />
-        </View>
-        <Clock />
-        <Stats info={info} />
-        <Widgets
+  return fontLoaded ? (
+    <View style={styles.container}>
+      {loading && (
+        <AnimatedLoader
+          visible={true}
+          overlayColor="rgba(255,255,255,0.75)"
+          source={require("./StaffDirectory/loader.json")}
+          animationStyle={styles.lottie}
+          speed={1}
+        />
+      )}
+      <View style={styles.topPanel}>
+        <Image source={require("./assets/kindyLogo.png")} style={{width: 400}}/>
+        <StaffPanel
+          staff={staffOnDuty}
           navigate={props.navigation.navigate}
-          setInfo={setInfo}
-          setRefresh={setRefresh}
-          info={info}
-          setResetting={setResetting}
-          staffOnDuty={staffOnDuty}
           setStaffOnDuty={setStaffOnDuty}
-          resetData={resetData}
+          staffNeeded={staffNeeded}
         />
       </View>
-          : <Text>LOADING</Text>)
-}
+      <Clock />
+      <Stats info={info} holidayMode={holidayMode} />
+      <Widgets
+        navigate={props.navigation.navigate}
+        setInfo={setInfo}
+        setRefresh={setRefresh}
+        info={info}
+        setResetting={setResetting}
+        staffOnDuty={staffOnDuty}
+        setStaffOnDuty={setStaffOnDuty}
+        resetData={resetData}
+        holidayMode={holidayMode}
+        setHolidayMode={setHolidayMode}
+        staff={staff}
+        setStaff={setStaff}
+      />
+    </View>
+  ) : (
+    <Text>LOADING</Text>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -130,17 +162,17 @@ const styles = StyleSheet.create({
     paddingLeft: "2%",
     paddingRight: "2%",
     paddingTop: "3%",
-
   },
   lottie: {
     width: 100,
-    height: 100
+    height: 100,
   },
   topPanel: {
-    flex: 0.15,
+    flex: 0.2,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingLeft: "2%",
+    alignItems: "center",
+    padding: "2%",
   },
   text: {
     fontFamily: "mainFont",

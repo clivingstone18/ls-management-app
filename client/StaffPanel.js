@@ -4,13 +4,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUserAlt } from "@fortawesome/free-solid-svg-icons";
 
 export const StaffPanel = (props) => {
+  let numDip = 0;
+  props.staff.map(staff=>staff.hasdiploma ? numDip++ : null)
+
   let color;
-  props.staff.length < props.staffNeeded ? (color = "red") : (color = "green");
+  props.staff.length < props.staffNeeded || numDip/props.staff.length < 0.5 ? (color = "red") : (color = "green");
   props.staffNeeded === 0 ? (color = "black") : null;
-  
   return (
     <View style={styles.container}>
       <View style={styles.staffIcon}>
+      <Text
+          style={{
+            fontWeight: "700",
+            fontSize: 25,
+            fontFamily: "mainFont",
+            marginRight: "3%",
+          }}
+        >
+          ON DUTY
+        </Text>
         <FontAwesomeIcon icon={faUserAlt} size={60}></FontAwesomeIcon>
         <Text
           style={{
@@ -19,7 +31,7 @@ export const StaffPanel = (props) => {
             marginRight: "3%",
           }}
         >
-          On duty
+          Dip: {numDip}
         </Text>
         <Text
           style={{
@@ -28,10 +40,22 @@ export const StaffPanel = (props) => {
             marginRight: "3%",
           }}
         >
-          {props.staff.length}
+          Non: {props.staff.length - numDip}
         </Text>
       </View>
+
       <View style={styles.staffIcon}>
+        <Text
+          style={{
+            fontWeight: "700",
+            fontSize: 25,
+            fontFamily: "mainFont",
+            marginRight: "3%",
+            color: color,
+          }}
+        >
+          REQUIRED
+        </Text>
         <FontAwesomeIcon
           icon={faUserAlt}
           size={60}
@@ -42,10 +66,10 @@ export const StaffPanel = (props) => {
             fontSize: 25,
             fontFamily: "mainFont",
             marginRight: "3%",
-            color: color,
+            color,
           }}
         >
-          Required
+          Total: {props.staffNeeded}
         </Text>
         <Text
           style={{
@@ -55,7 +79,7 @@ export const StaffPanel = (props) => {
             color,
           }}
         >
-          {props.staffNeeded}
+          Dip: {props.staffNeeded * 0.5}+
         </Text>
       </View>
     </View>
@@ -70,7 +94,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     shadowColor: "#000",
     borderRadius: 5,
-    width: "95%",
+    width: "100%",
     paddingLeft: "2%",
     marginLeft: "2%",
     shadowOffset: {
@@ -90,7 +114,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-evenly",
     marginRight: "30%",
-    width: "90%",
+    width: "100%",
     height: "100%",
   },
 });

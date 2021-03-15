@@ -27,15 +27,11 @@ router.post('/api/staff/post', (req, res, next) => {
 router.post('/api/staff/delete', (req, res, next) => {
   let staffID = req.body.staffID;
   let queryString = `DELETE from staff WHERE staffid = '${staffID}';`;
-  console.log(queryString)
   connectToDB(queryString).then(response=>{
-    console.log(response)
-    res.send(response)
+    res.send("Deleted successfully")
   }).catch(err=>{
-    console.log(err)
     res.send(err)
   })
-
 })
 
 // get 
@@ -57,13 +53,12 @@ router.get('/api/classData/:date/get', (req, res, next) => {
   let queryString = `SELECT * from classData WHERE dateof = '${req.params.date}';
 
   SELECT * from 
-
   (SELECT * from staffsupervises WHERE entryid 
   IN (SELECT entryid from classData WHERE dateof = '${req.params.date}')) as info
   INNER JOIN staff ON staff.staffid = info.staffid
-  
   ; 
   `
+  console.log(queryString);
   connectToDB(queryString).then(response=>{
     res.send(response)
   }).catch(err=>{
@@ -71,17 +66,11 @@ router.get('/api/classData/:date/get', (req, res, next) => {
   })
 });
 
-
-
-
-
-
 router.post('/api/classData/post', (req, res, next) => {
   let data = req.body.data;
-
-  let queryString = `INSERT INTO classData(numkook, numkoala, numemu, numkang, dateof, timeof) 
-  VALUES ('${data.numKook}', '${data.numNursery}', '${data.numEmus}', '${data.numKangaroos}',
-  '${data.date}', '${data.time}');
+  let queryString = `INSERT INTO classData(numkook, numkoala, numemu, numkang, numcroc, dateof, timeof) 
+  VALUES ('${data.numKook}', '${data.numNursery}', '${data.numEmus}', '${data.numKangaroos}', 
+  '${data.numCroc}', '${data.date}', '${data.time}');
 
   ${
     data.staffOnDuty.map(staff => 
@@ -91,16 +80,10 @@ router.post('/api/classData/post', (req, res, next) => {
       `).join("")
   }
   `
-
-  console.log(queryString)
   connectToDB(queryString).then(response=>{
     res.send(response)
   }
-  
-  
-  
   ).catch(err=>{
-    console.log(err)
     res.send(err)
   })
 })

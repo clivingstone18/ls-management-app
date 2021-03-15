@@ -37,22 +37,15 @@ function Clock() {
 
 const clockStyles = StyleSheet.create({
   container: {
-    flex: 0.2,
+    flex: 0.15,
     backgroundColor: "white",
     alignItems: "flex-start",
     justifyContent: "center",
+    alignSelf: "center",
     shadowColor: "#000",
     borderRadius: 15,
-    width: "94%",
+    width: "88%",
     paddingLeft: "4%",
-    marginLeft: "3.2%",
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 5.0,
-    elevation: 10,
   },
   text: {
     fontSize: 40,

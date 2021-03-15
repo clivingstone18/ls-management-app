@@ -29,7 +29,7 @@ export const DataViewDate = (props) => {
     // api call to get most recent
     let date = moment(props.date).format("YYYY-MM-DD")
     UserService.getClassDataOnDate(date).then(res=>{
-        let info = res.data[0].rows
+        let info = res.data;
 
         // process info 
         let processedInfoMorning = [];

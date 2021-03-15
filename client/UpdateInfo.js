@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import moment from 'moment'; 
 import UserService from "./services/UserService"
 import {
@@ -22,14 +22,18 @@ export const UpdateInfo = (props) => {
   const staffOnDuty = props.route.params.staffOnDuty;
 
   let info = props.route.params.prevInfo;
+  let showCroc = props.route.params.holidayMode;
+
   const [numNursery, setNumNursery] = useState(info.numkoala);
   const [numKangaroos, setNumKangaroos] = useState(info.numkang);
   const [numEmus, setNumEmus] = useState(info.numemu);
   const [numKook, setNumKook] = useState(info.numkook);
+  const [numCroc, setNumCroc] = useState(info.numcroc);
   const [showPicker1, setShowPicker1] = useState(false);
   const [showPicker2, setShowPicker2] = useState(false);
   const [showPicker3, setShowPicker3] = useState(false);
   const [showPicker4, setShowPicker4] = useState(false);
+  const [showPicker5, setShowPicker5] = useState(false);
   const [showTime, setShowTime] = useState(false);
 
   // add to local storage 
@@ -45,6 +49,7 @@ export const UpdateInfo = (props) => {
       numKangaroos: numKangaroos,
       numEmus: numEmus,
       numKook: numKook,
+      numCroc: numCroc,
       staffOnDuty: staffOnDuty,
     };
     UserService.addNewClassData(newInfo).then(res=>{
@@ -54,12 +59,13 @@ export const UpdateInfo = (props) => {
   };
 
   const handleShow = (currPicker) => {
-    let vars = [showPicker1, showPicker2, showPicker3, showPicker4, showTime];
+    let vars = [showPicker1, showPicker2, showPicker3, showPicker4, showPicker5, showTime];
     let methods = [
       setShowPicker1,
       setShowPicker2,
       setShowPicker3,
       setShowPicker4,
+      setShowPicker5,
       setShowTime,
     ];
 
@@ -100,7 +106,7 @@ export const UpdateInfo = (props) => {
             }}
           >
             <Text style={styles.text}>{moment(date).format("hh:mm A")}</Text>
-            <TouchableOpacity onPress={() => handleShow(4, !showTime)}>
+            <TouchableOpacity onPress={() => handleShow(5)}>
               {!showTime ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
               ) : (
@@ -131,7 +137,7 @@ export const UpdateInfo = (props) => {
             }}
           >
             <Text style={styles.text}>{numNursery}</Text>
-            <TouchableOpacity onPress={() => handleShow(0, setShowPicker1)}>
+            <TouchableOpacity onPress={() => handleShow(0)}>
               {!showPicker1 ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
               ) : (
@@ -154,7 +160,7 @@ export const UpdateInfo = (props) => {
             }}
           >
             <Text style={styles.text}>{numKook}</Text>
-            <TouchableOpacity onPress={() => handleShow(1, setShowPicker2)}>
+            <TouchableOpacity onPress={() => handleShow(1)}>
               {!showPicker2 ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
               ) : (
@@ -176,7 +182,7 @@ export const UpdateInfo = (props) => {
             }}
           >
             <Text style={styles.text}>{numEmus}</Text>
-            <TouchableOpacity onPress={() => handleShow(2, setShowPicker3)}>
+            <TouchableOpacity onPress={() => handleShow(2)}>
               {!showPicker3 ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
               ) : (
@@ -199,7 +205,7 @@ export const UpdateInfo = (props) => {
             }}
           >
             <Text style={styles.text}>{numKangaroos}</Text>
-            <TouchableOpacity onPress={() => handleShow(3, setShowPicker4)}>
+            <TouchableOpacity onPress={() => handleShow(3)}>
               {!showPicker4 ? (
                 <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
               ) : (
@@ -209,6 +215,35 @@ export const UpdateInfo = (props) => {
           </View>
         </View>
         {showPicker4 ? <GroupCounter count={numKangaroos} setCount={setNumKangaroos} /> : null}
+
+        {showCroc &&
+        <>
+
+        <Text style={styles.text}>Number in crocodiles</Text>
+        <View style={styles.form}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              backgroundColor: showPicker5 ? "#f3f3f3" : "white",
+            }}
+          >
+            <Text style={styles.text}>{numCroc}</Text>
+            <TouchableOpacity onPress={() => handleShow(4)}>
+              {!showPicker4 ? (
+                <Emoji name="arrow_down_small" style={{ fontSize: 30 }} />
+              ) : (
+                <Emoji name="arrow_up_small" style={{ fontSize: 30 }} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+        {showPicker5 ? <GroupCounter count={numCroc} setCount={setNumCroc} />
+ : null}
+         </> }
+
+
       </View>
       <View>
         <ButtonAll handlePress={onSubmit} title={"Save changes"} />
@@ -219,7 +254,7 @@ export const UpdateInfo = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: "7%",
+    padding: "5%",
     flex: 1,
     backgroundColor: "#f3f3f3",
     flexDirection: "column",
@@ -232,9 +267,6 @@ const styles = StyleSheet.create({
     paddingLeft: "0.5%",
     marginBottom: "2%",
     flexDirection: "row",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5.0,
   },
   text: {
     fontFamily: "mainFont",

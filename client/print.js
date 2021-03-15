@@ -36,9 +36,6 @@ export const print = async (info, date) => {
       <td>${staffNames}</td>`;
   };
 
-  let { printerName, printerUrl } = Print.selectPrinterAsync().catch((e) =>
-    console.log("fail")
-  );
 
   let html =
     "<style> body {font-family:Helvetica;} img {height: 50px; width: 250px}</style><body><img alt=" +
@@ -51,27 +48,16 @@ export const print = async (info, date) => {
     "</tr></thead><tbody>" +
     info.map((element) => "<tr>" + getInfoAsStr(element) + "</tr>").join("") +
     "</tbody></table></body>";
-  let { pdfURI, numPages, base64 } = Print.printToFileAsync({
-    html: html,
-    width: 612,
-    height: 792,
-    base64: true,
-  });
-
-  try {
-    let printedFile = Print.printAsync({
-      uri: pdfURI,
-      html: html,
-      width: 612,
-      height: 792,
-      printerUrl: printerUrl,
-      orientation: Print.Orientation.portrait,
-    });
-    console.log(printedFile)
-    resolve(printedFile)
+  
+    Print.selectPrinterAsync().then(({printerName, printerUrl}) => {
+      Print.printToFileAsync({
+        html: html,
+        base64: true}).then(({uri, numberOfPages, base64}) => {
+          Print.printAsync({uri: uri, printerUrl: printerUrl})
+          .then(res => resolve(res)).catch(err=>{
+            reject(err)
+          })
+        }).catch(err=>reject(err))
+      }).catch(err=>reject(err))
+    }).catch(err=>reject(err))
   }
-  catch (err) {
-    reject(err)
-  }
-})
-}

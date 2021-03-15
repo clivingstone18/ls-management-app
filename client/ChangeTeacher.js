@@ -16,9 +16,7 @@ export const ChangeTeacher = (props) => {
   );
   const [loading, setLoading] = useState(true);
   const [submit, setSubmit] = useState(false);
-  const [staffList, setStaffList] = useState([]);
-
-  const info = props.route.params.info;
+  const staffList = props.route.params.staff;
 
   const handleSubmit = () => {
     setSubmit(true);
@@ -35,46 +33,29 @@ export const ChangeTeacher = (props) => {
     }
   };
 
-
-
-  useEffect(() => {
-    setLoading(true)
-    UserService.getAllStaff()
-      .then((res) => {
-        setLoading(false)
-        setStaffList(res.data);
-      })
-      .catch((e) => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    const getData = async () => {
+  const getData = async () => {
+    return new Promise(async (resolve, reject) => {
       try {
         let jsonValue = await AsyncStorage.getItem("staffPicked");
         if (jsonValue !== null) {
-          return JSON.parse(jsonValue);
+          resolve(JSON.parse(jsonValue));
         } else {
-          return [];
+          resolve([])
         }
       } catch (e) {
-        console.log("ERROR");
+        reject(e)
       }
-    };
-    getData()
-      .then((val) => {
-        setStaffPicked(val);
-      })
-      .catch((e) => console.log("failed"));
+    })
+  }
+
+  useEffect(() => {
+    setLoading(true);
+    console.log("change teacher?");
+    getData().then(values => {
+      setStaffPicked(values);
+      setLoading(false);
+    });
   }, []);
-
-
-
-
-
-
-
-
-
 
 
 

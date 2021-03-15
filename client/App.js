@@ -22,9 +22,8 @@ function App() {
         <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
         <Stack.Screen name="PrintSheet" component={DateSheetTimeChanger} />
         <Stack.Screen name="ChangeTeacher" component={ChangeTeacher} />
-        <Stack.Screen name="StaffDirectory" component={StaffDirectory} />
+           <Stack.Screen name="StaffDirectory" component={StaffDirectory} />
         <Stack.Screen name="DataView" component={DataView} />
-
       </Stack.Navigator>
     </NavigationContainer>
   );
