@@ -15,5 +15,10 @@
     "morgan": "~1.9.1",
     "nodemon": "^2.0.7",
     "pg": "^8.5.1"
-  }
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
