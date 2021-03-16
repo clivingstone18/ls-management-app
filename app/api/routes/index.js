@@ -6,6 +6,7 @@ const connectToDB = require('../controllers/connectToDB')
 var moment = require("moment")
 
 
+
 /* GET home page. */
 router.get('/api/', function(req, res, next) {
 
@@ -36,6 +37,7 @@ router.post('/api/staff/delete', (req, res, next) => {
 
 // get 
 router.post('/api/classData/mostrecent/get', (req, res, next) => {
+  console.log("WE GOT THERE?")
   let today = moment().format("YYYY-MM-D")
   
   let queryString = `SELECT * from classData WHERE dateOf = '${today}'

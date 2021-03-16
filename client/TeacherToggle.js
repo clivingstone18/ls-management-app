@@ -24,10 +24,11 @@ export const TeacherToggle = ({
     }
   };
 
+
   return (
       <View style={styles.container}>
         <Text style={styles.text}>
-          {`${staff.firstname} ${staff.lastname[0]}`}{" "}
+          {`${staff.firstname.toUpperCase()} ${staff.lastname[0].toUpperCase()}`}{" "}
         </Text>
         <Switch
           trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -42,10 +43,12 @@ export const TeacherToggle = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.8,
     alignItems: "center",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
     flexDirection: "row",
+    alignSelf: "center",
+    width: "80%"
   },
 
   text: {

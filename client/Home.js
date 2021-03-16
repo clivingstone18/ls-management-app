@@ -87,12 +87,14 @@ export const Home = (props) => {
     }
  
     if (isFocused && refresh) {
+      console.log("FOC ADN REFRENCH")
       let promises = [getData(), UserService.getClassData(), UserService.getAllStaff()]
       setLoading(true);
       setRefresh(false);
       Promise.all(promises).then(res=>{
+        console.log(res);
         setStaffOnDuty(res[0]);
-        setInfo(res[1].data[0]);
+        if (res[1].data.length > 0) setInfo(res[1].data[0]);
         setStaff(res[2].data);
         setLoading(false);
       }).catch(err=>console.log(err))

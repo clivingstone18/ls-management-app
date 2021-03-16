@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, Text, View, Dimensions, ScrollView, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCaretLeft , faCaretRight} from "@fortawesome/free-solid-svg-icons";
-import * as ScreenOrientation from 'expo-screen-orientation';
 import {DataViewDate} from "./DataViewDate";
 
 const { height } = Dimensions.get("window");

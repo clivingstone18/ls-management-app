@@ -102,11 +102,6 @@ export const Widgets = (props) => {
               }
             />
             <Widget
-              title="View daily data"
-              icon={faBookOpen}
-              handleOnPress={() => props.navigate("DataView", {})}
-            />
-            <Widget
               title="Set school holiday mode"
               icon={faSun}
               handleOnPress={() => {

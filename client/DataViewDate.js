@@ -30,20 +30,10 @@ export const DataViewDate = (props) => {
     let date = moment(props.date).format("YYYY-MM-DD")
     UserService.getClassDataOnDate(date).then(res=>{
         let info = res.data;
-
         // process info 
         let processedInfoMorning = [];
         let processedInfoAfternoon = [];
-        for (let i=0; i < info.length; i++) {
-          let currHour = moment(info[i].timeof, "HH:mm:ss").format("HH");
-          let data = {time: moment(info[i].timeof, "HH:mm:ss").format("hh:mm A"), numChildren: info[i].numemu+info[i].numkang+info[i].numkoala+info[i].numkook}
-          if (currHour < 12) {
-            processedInfoMorning.push(data);
-          }
-          else {
-            processedInfoAfternoon.push(data);
-          }
-        }
+        console.log(info);
         setMornTimes(processedInfoMorning.map(i=>i.time));
         setMornCounts(processedInfoMorning.map(i=>i.numChildren));
         setAfternoonTimes(processedInfoAfternoon.map(i=>i.time));

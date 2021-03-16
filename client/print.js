@@ -8,10 +8,11 @@ export const print = async (info, date) => {
     "# Kooka",
     "# Emus",
     "# Kanga",
+    "# Croc",
     "# Children",
     "# Staff",
     "# Staff req",
-    "Staff initials",
+    "Initials",
   ];
 
   const getInfoAsStr = (info) => {
@@ -20,16 +21,18 @@ export const print = async (info, date) => {
     let kookaburras = info[2];
     let emus = info[3];
     let kangaroos = info[4];
-    let numChildren = info[5]
-    let numStaff = info[8].split("\n").length
-    let staffRequired = info[7]
-    let staffNames = info[8].split("\n").join(", ")
+    let croc = info[5];
+    let numChildren = info[6]
+    let numStaff = info[9].split("\n").length
+    let staffRequired = info[8]
+    let staffNames = info[9].split("\n").join(", ")
 
     return `<td>${time}</td>
       <td>${nursery}</td>
       <td>${kookaburras}</td>
       <td>${emus}</td>
       <td>${kangaroos}</td>
+      <td>${croc}</td>
       <td>${numChildren}</td>
       <td>${numStaff}</td>
       <td>${staffRequired}</td>
@@ -59,5 +62,6 @@ export const print = async (info, date) => {
           })
         }).catch(err=>reject(err))
       }).catch(err=>reject(err))
-    }).catch(err=>reject(err))
+      .catch(err=>reject(err))
+    })
   }

@@ -16,5 +16,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.listen(8080, ()=>console.log("STARTED"));
 
 module.exports = app;
